@@ -39,16 +39,17 @@ public:
 	bool exists();
 	bool remove();
 	bool truncate();
+	bool alter(Field newField);//append a field, add by huangqi 2015.8.17
 
 public:
 	bool open();
 	bool open(string whereCondition);
 	bool open(string whereCondition, string sortBy);
 	bool query(string queryStr);
-	int totalRecordCount();
+	size_t totalRecordCount();
 
 public:
-	int recordCount();
+	size_t recordCount();
 	Record* getRecord(int record_index);
 	Record* getTopRecord();
 	Record* getRecordByKeyId(integer keyId);
@@ -56,6 +57,7 @@ public:
 public:
 	bool addRecord(Record* record);
 	bool updateRecord(Record* record);
+	bool updateRecord(std::map<Field*, Value*> mapColumn);
 	bool deleteRecords(string whereCondition);
 	bool copyRecords(Table& source);
 	bool backup(Table& source);

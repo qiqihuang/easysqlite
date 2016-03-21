@@ -48,8 +48,8 @@ public:
 	FieldSet* fields();
 
 public:
-	int count();
-	Record* getRecord(int record_index);
+	size_t count();
+	Record* getRecord(size_t record_index);
 	Record* getTopRecord();
 	Value* getTopRecordFirstValue();
 	string toString();

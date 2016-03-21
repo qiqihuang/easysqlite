@@ -33,11 +33,11 @@ string Table::toString()
 {
 	string s;
 
-	for (int index = 0; index < fields()->count(); index++)
+	for (size_t index = 0; index < fields()->count(); index++)
 	{
 		if (Field* f = fields()->getByIndex(index))
 		{
-			s += intToStr(index + 1) + ". " + f->getDefinition();
+			s += intToStr((integer)index + 1) + ". " + f->getDefinition();
 
 			if (index < (fields()->count() - 1))
 				s +="\r\n";
@@ -147,6 +147,18 @@ bool Table::remove()
 	return false;
 }
 
+bool Table::alter(Field newField)
+{
+	const string queryStr = "alter table " + _tableName + " add column " + newField.getName() + " " + newField.getTypeStr();
+
+	if (_recordset.query(queryStr))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool Table::deleteRecords(string whereCondition)
 {	
 	const string sql = "delete from " + _tableName + (whereCondition.empty() ? "" : " where " + whereCondition);
@@ -161,12 +173,12 @@ bool Table::deleteRecords(string whereCondition)
 	return false;
 }
 
-int Table::recordCount()
+size_t Table::recordCount()
 {
 	return _recordset.count();
 }
 
-int Table::totalRecordCount()
+size_t Table::totalRecordCount()
 {
 	const string queryStr = "select count(*) from " + _tableName;
 
@@ -176,11 +188,11 @@ int Table::totalRecordCount()
 	{
 		if (Value* value = rs.getTopRecordFirstValue())
 		{
-			return (int)value->asInteger();
+			return (size_t)value->asInteger();
 		}
 	}
 
-	return -1;
+	return 0;//modify by huangqi
 }
 
 bool Table::exists()
@@ -202,6 +214,15 @@ bool Table::exists()
 
 Record* Table::getRecord(int record_index)
 {
+	//Begin: Reload _recordset
+	const string queryStr = "select * from " + _tableName;
+
+	if (!_recordset.query(queryStr))
+	{
+		return NULL;
+	}
+	//End: Add by huangqi
+
 	return _recordset.getRecord(record_index);
 }
 
@@ -257,9 +278,83 @@ bool Table::updateRecord(Record* record)
 	return false;
 }
 
+bool Table::updateRecord(std::map<Field*, Value*> mapColumn)
+{
+	std::string sCondition;
+
+	std::map<Field*, Value*>::iterator it;
+	for (it = mapColumn.begin(); it != mapColumn.end(); ++it)
+	{
+		Field* field = it->first;
+		if (NULL == field)
+		{
+			continue;
+		}
+
+		if (!field->isKeyIdField())
+		{
+			continue;
+		}
+
+		Value* value = it->second;
+		if (NULL == value)
+		{
+			continue;
+		}
+
+		sCondition = " where _ID = " + value->toSql(type_int);
+		break;
+	}
+
+	if (sCondition.empty())
+	{
+		return false;
+	}
+
+	std::string sUpdateSet;
+
+	size_t i = 0;
+	for (it = mapColumn.begin(); it != mapColumn.end(); ++it, ++i)
+	{
+		Field* field = it->first;
+		if (NULL == field)
+		{
+			continue;
+		}
+
+		if (field->isKeyIdField())
+		{
+			continue;
+		}
+
+		Value* value = it->second;
+		if (NULL == value)
+		{
+			continue;
+		}
+
+		sUpdateSet += field->getName() + "=" + value->toSql(field->getType());
+		if (i < mapColumn.size() - 1)//exclude the key field
+		{
+			sUpdateSet += ", ";
+		}
+	}
+
+	if (sUpdateSet.empty())
+	{
+		return false;
+	}
+
+	string sSQL = "update " + name() + " set " + sUpdateSet + sCondition;
+
+	RecordSet rs(_db, _recordset.fields());
+
+	return rs.query(sSQL);
+}
+
 bool Table::copyRecords(Table& source)
 {
-	for (int index = 0; index < source.recordCount(); index++)
+	for (size_t index = 0; index < source.recordCount(); index++)
 	{
 		if (Record* record = source.getRecord(index))
 		{

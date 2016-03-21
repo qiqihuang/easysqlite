@@ -1,6 +1,5 @@
 #include "SqlRecord.h"
 
-
 namespace sql
 {
 
@@ -39,7 +38,7 @@ void Record::initColumnValue(int column_index, char* value, field_type type)
 	_values[column_index].setValue(value, type);
 }
 
-int Record::columnCount()
+size_t Record::columnCount()
 {
 	return _values.size();
 }
@@ -62,7 +61,7 @@ Value* Record::getValue(string fieldName)
 
 Value* Record::getKeyIdValue()
 {
-	for (int index = 0; index < _fields->count(); index++)
+	for (size_t index = 0; index < _fields->count(); index++)
 	{
 		if (Field* field = _fields->getByIndex(index))
 		{
@@ -78,7 +77,7 @@ string Record::toString()
 {
 	string s;
 
-	for (int column = 0; column < columnCount(); column++)
+	for (size_t column = 0; column < columnCount(); column++)
 		if (Value* value = getValue(column))
 		{
 			s += value->toString();
@@ -93,7 +92,7 @@ string Record::toSql()
 {
 	string s;
 
-	for (int index = 0; index < _fields->count(); index++)
+	for (size_t index = 0; index < _fields->count(); index++)
 	{
 		if (Field* field = _fields->getByIndex(index))
 		{
@@ -152,6 +151,7 @@ Field* Record::fieldByName(string fieldName)
 	{
 		return field;
 	} else {
+		printf("Record::fieldByName: field '%s' not found\n", fieldName.c_str());
 		THROW_EXCEPTION("Record::fieldByName: field '" + fieldName + "' not found")
 		return NULL;
 	}
@@ -210,7 +210,7 @@ string Record::toSqlUpdate(string tableName)
 {
 	string s = "update " + tableName + " set ";
 
-	for (int index = 0; index < _fields->count(); index++)
+	for (size_t index = 0; index < _fields->count(); index++)
 	{
 		if (Field* field = _fields->getByIndex(index))
 		{
@@ -248,7 +248,7 @@ bool Record::equalsValues(Record* record)
 {
 	if (record)
 	{
-		for (int index = 0; index < _fields->count(); index++)
+		for (size_t index = 0; index < _fields->count(); index++)
 		{
 			if (Field* field = _fields->getByIndex(index))
 			{

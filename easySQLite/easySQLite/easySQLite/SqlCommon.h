@@ -8,6 +8,13 @@
 
 #include <string>
 #include <vector>
+#include <map>
+
+#ifdef _WIN32
+#include <locale>
+#include <codecvt>
+#endif
+
 #include <stdio.h>
 #include <time.h>
 
@@ -133,7 +140,7 @@ public:
 	{
 		std::string text = s;
 		text += "\r\n";
-		printf(text.c_str());
+		printf("%s", text.c_str());
 	}
 };
 
@@ -154,6 +161,10 @@ string trim(const string& s);
 
 void listToVector(string s, std::vector<string>& vector, const char* sep = ",");
 
+//add by huangqi, 2015/10/14
+#ifdef _WIN32
+std::string _UTF8(std::string const& mbstr, const char* _loc = "");
+#endif
 
 //sql eof
 };

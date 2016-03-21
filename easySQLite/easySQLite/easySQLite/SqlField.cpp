@@ -27,6 +27,11 @@ Field::Field(string name, field_type type, int flags)
 	this->_type = type;
 	this->_index = -1;
 	this->_flags = flags;
+
+	if (name == "_ID")//add by huangqi
+	{
+		this->_use = FIELD_KEY;
+	}
 }
 
 Field::Field(const Field& value)

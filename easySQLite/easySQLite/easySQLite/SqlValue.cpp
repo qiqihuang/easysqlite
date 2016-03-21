@@ -1,3 +1,4 @@
+#include <sstream>
 #include "SqlValue.h"
 
 
@@ -105,8 +106,16 @@ integer Value::asInteger()
 {
 	if (isNull())
 		return 0;
+#if (defined ANDROID) || (defined IOS_PLATFORM) || (defined _LINUX)
+	std::stringstream stream;
+	stream << _value;
 
+	integer nValue;
+	stream >> nValue;
+	return nValue;
+#elif defined(_WIN32)
 	return _atoi64(_value.c_str());
+#endif
 }
 
 double Value::asDouble()
@@ -114,7 +123,18 @@ double Value::asDouble()
 	if (isNull())
 		return 0.0;
 
+#if (defined ANDROID) || (defined _LINUX)
+	std::stringstream stream;
+	stream << _value;
+
+	double fValue;
+	stream >> fValue;
+	return fValue;
+#elif defined(IOS_PLATFORM)
 	return atof(_value.c_str());
+#elif defined(_WIN32)
+	return atof(_value.c_str());
+#endif
 }
 
 bool Value::asBool()
@@ -141,6 +161,7 @@ void Value::setString(string value)
 {
 	_isNull = false;
 	_value = value;
+	_type = type_text;//add by huangqi, 2015.9.24
 }
 
 //CRT_SECURE_NO_WARNINGS
@@ -149,11 +170,17 @@ void Value::setString(string value)
 void Value::setInteger(integer value)
 {
 	char buffer[128];
-
+#if (defined ANDROID) || (defined IOS_PLATFORM) || (defined _LINUX)
+	std::stringstream stream;
+	stream << value;
+	stream >> buffer;
+#elif defined(_WIN32)
 	_i64toa(value, buffer, 10);
+#endif
 
 	_isNull = false;
 	_value = buffer;
+	_type = type_int;//add by huangqi, 2015.9.24
 }
 
 void Value::setDouble(double value)
@@ -164,6 +191,7 @@ void Value::setDouble(double value)
 
 	_isNull = false;
 	_value = buffer;
+	_type = type_float;//add by huangqi, 2015.9.24
 }
 
 #pragma warning(default : 4996)
@@ -172,6 +200,7 @@ void Value::setBool(bool value)
 {
 	_isNull = false;
 	_value = (value ? "1" : "0");
+	_type = type_bool;//add by huangqi, 2015.9.24
 }
 
 void Value::setTime(time value)
@@ -179,6 +208,7 @@ void Value::setTime(time value)
 	time t(value);
 	_isNull = false;
 	setInteger(t.asInteger());
+	_type = type_time;//add by huangqi, 2015.9.24
 }
 
 bool Value::isNull()

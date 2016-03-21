@@ -45,16 +45,17 @@ void FieldSet::copy(const std::vector<Field>& definition)
 	for (int index = 0; index < (int)_vec.size(); index++)
 	{
 		Field& field = _vec[index];
+		field._index = index;//add by huangqi
 		_map[field.getName()] = &field;
 	}
 }
 
-int FieldSet::count()
+size_t FieldSet::count()
 {
-	return (int)_vec.size();
+	return _vec.size();
 }
 
-Field* FieldSet::getByIndex(int index)
+Field* FieldSet::getByIndex(size_t index)
 {
 	if ((index >= 0) && (index < count()))
 		return &_vec[index];
@@ -67,11 +68,24 @@ Field* FieldSet::getByName(string name)
 	return _map[name];
 }
 
+Field* FieldSet::getKeyId()
+{
+	for (size_t i = 0; i < _vec.size(); ++i)
+	{
+		if (_vec[i].isKeyIdField())
+		{
+			return &_vec[i];
+		}
+	}
+
+	return NULL;
+}
+
 string FieldSet::getDefinition()
 {
 	string s;
 
-	for (int index = 0; index < count(); index++)
+	for (size_t index = 0; index < count(); index++)
 	{
 		if (Field* f = getByIndex(index))
 		{
@@ -86,14 +100,16 @@ string FieldSet::getDefinition()
 
 string FieldSet::definitionHash()
 {
-	return generateSHA(getDefinition());
+	string sDefination = getDefinition();
+	string sSHA = generateSHA(sDefination);
+	return sSHA;
 }
 
 string FieldSet::toString()
 {
 	string s;
 
-	for (int index = 0; index < count(); index++)
+	for (size_t index = 0; index < count(); index++)
 	{
 		if (Field* f = getByIndex(index))
 		{

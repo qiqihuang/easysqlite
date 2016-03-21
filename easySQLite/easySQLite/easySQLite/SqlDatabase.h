@@ -8,6 +8,7 @@
 
 #include "sqlite3.h"
 #include "SqlCommon.h"
+#include "SqlField.h"
 
 
 namespace sql
@@ -30,6 +31,7 @@ public:
 	bool open(string filename);
 	void close();
 	bool isOpen();
+	bool getTableFields(string tablename, std::vector<Field>& tbDef);//add by huangqi 2015.8.17
 
 public:
 	bool transactionBegin();

@@ -33,7 +33,7 @@ private:
 	void initColumnValue(int column_index, char* value, field_type type);
 
 public:
-	int columnCount();
+	size_t columnCount();
 	Value* getValue(int column_index);
 	Value* getValue(string fieldName);
 	Value* getKeyIdValue();

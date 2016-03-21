@@ -1,6 +1,8 @@
+#include <ctype.h>
+#include <string.h>
+#include <time.h>
 #include "SqlCommon.h"
-#include "SHA1.h"
-
+#include "sha1.h"
 
 namespace sql
 {
@@ -64,12 +66,28 @@ time_t time::get()
 string time::format(const char* format)
 {
 	string s;
-	tm localtime;
+	tm* _localtime = NULL;
 	char buffer[128];
 
-  if (localtime_s(&localtime, &_value) == 0)
-		if (strftime(buffer, 128, format, &localtime) > 0)
+#if defined(ANDROID)
+	_localtime = localtime(&_value);
+#elif defined(IOS_PLATFORM)
+	_localtime = localtime_r(&_value, _localtime);
+#elif defined(_WIN32)
+	localtime_s(_localtime, &_value);
+#elif defined(_LINUX)
+	_localtime = localtime(&_value);
+#endif
+
+	if (NULL != _localtime)
+	{
+		if (strftime(buffer, 128, format, _localtime) > 0)
+		{
 			s = buffer;
+		}
+
+		_localtime = NULL;
+	}
 
 	return s;
 }
@@ -113,14 +131,36 @@ void time::addDays(integer count)
 string intToStr(int value)
 {
 	char buffer[32];
+	memset(buffer, '\0', 32);
+
+#if defined(ANDROID)
+	snprintf(buffer, sizeof(buffer), "%d", value);
+#elif defined(IOS_PLATFORM)
+	sprintf(buffer, "%d",value);
+#elif defined(_WIN32)
 	_itoa_s(value, buffer, sizeof(buffer), 10);
+#elif defined(_LINUX)
+	snprintf(buffer, sizeof(buffer), "%d", value);
+#endif
+
 	return buffer;
 }
 
 string intToStr(integer value)
 {
 	char buffer[64];
+	memset(buffer, '\0', 64);
+
+#if defined(ANDROID)
+	snprintf(buffer, sizeof(buffer), "%lld", value);
+#elif defined(IOS_PLATFORM)
+	sprintf(buffer, "%lld",value);
+#elif defined(_WIN32)
 	_i64toa_s(value, buffer, sizeof(buffer), 10);
+#elif defined(_LINUX)
+	snprintf(buffer, sizeof(buffer), "%lld", value);
+#endif
+
 	return buffer;
 }
 
@@ -128,7 +168,7 @@ string quoteStr(string value)
 {
 	string s;
 
-	for (string::iterator it = value.begin(); it != value.end(); it++)
+	for (string::iterator it = value.begin(); it != value.end(); ++it)
 	{
 		char c = *it;
 		s += c;
@@ -163,6 +203,7 @@ string binToHex(const char* buffer, int size)
 
 string generateSHA(string& value)
 {
+#if 0
 	CSHA1 sha;
 
 	sha.Update((UINT_8*)value.c_str(), value.length());
@@ -175,15 +216,21 @@ string generateSHA(string& value)
 		const int size = sizeof(digest) / sizeof(UINT_8);
 		return binToHex((char*)digest, size);
 	}
-
+	
 	return "";
+#else
+	SHA1 ctx;
+	ctx.add(value.c_str(), value.size());
+	return ctx.getHash();
+#endif
+
 }
 
 string& trimleft(string& s)
 {
 	string::iterator it;
 
-	for( it = s.begin(); it != s.end(); it++ )
+	for( it = s.begin(); it != s.end(); ++it )
 		if( !isspace( *it ) )
 			break;
 
@@ -196,7 +243,7 @@ string& trimright(string& s)
 	string::difference_type dt;
 	string::reverse_iterator it;
 
-	for( it = s.rbegin(); it != s.rend(); it++ )
+	for( it = s.rbegin(); it != s.rend(); ++it )
 		if( !isspace( *it ) )
 			break;
 
@@ -245,6 +292,20 @@ void listToVector(string s, std::vector<string>& vector, const char* sep)
 
 #pragma warning(default : 4996)
 
+#ifdef _WIN32
+std::string _UTF8(std::string const& mbstr, const char* _loc)
+{
+	using wcmb = std::codecvt_byname<wchar_t, char, std::mbstate_t>;
+	
+	std::wstring_convert<wcmb> mb2wc(new wcmb(_loc));
+	
+	auto wc = mb2wc.from_bytes(mbstr);
+	
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> wc2utf8;
+	
+	return wc2utf8.to_bytes(wc);
+}
+#endif
 
 //sql eof
 };

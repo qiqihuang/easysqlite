@@ -30,9 +30,10 @@ public:
 
 public:
 	string toString();
-	int count();
-	Field* getByIndex(int index);
+	size_t count();
+	Field* getByIndex(size_t index);
 	Field* getByName(string name);
+	Field* getKeyId();
 
 public:
 	string definitionHash();
