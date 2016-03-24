@@ -36,7 +36,7 @@ private:
 
 public:
 	RecordSet(sqlite3* db);
-	RecordSet(sqlite3* db, Field* definition);
+	RecordSet(sqlite3* db, const std::vector<Field>& vecFields);
 	RecordSet(sqlite3* db, FieldSet* fields);
 	~RecordSet(void);
 

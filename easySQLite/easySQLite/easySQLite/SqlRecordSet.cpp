@@ -4,7 +4,15 @@ namespace sql
 {
 
 RecordSet::RecordSet(sqlite3* db)
-	: _fields(NULL)
+{
+	_db = db;
+	_err_msg.clear();
+	_result_query = SQLITE_ERROR;
+	_records.clear();
+}
+
+RecordSet::RecordSet(sqlite3* db, const std::vector<Field>& vecFields)
+	: _fields(vecFields)
 {
 	_db = db;
 	_err_msg.clear();
@@ -14,15 +22,6 @@ RecordSet::RecordSet(sqlite3* db)
 
 RecordSet::RecordSet(sqlite3* db, FieldSet* fields)
 	: _fields(*fields)
-{
-	_db = db;
-	_err_msg.clear();
-	_result_query = SQLITE_ERROR;
-	_records.clear();
-}
-
-RecordSet::RecordSet(sqlite3* db, Field* definition)
-	: _fields(definition)
 {
 	_db = db;
 	_err_msg.clear();

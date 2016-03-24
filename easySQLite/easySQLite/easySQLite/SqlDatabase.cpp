@@ -54,11 +54,7 @@ bool Database::open(string filename)
 {
 	close();
 
-#ifdef _WIN32
-	_result_open = sqlite3_open(_UTF8(filename).c_str(), &_db);
-#else
 	_result_open = sqlite3_open(filename.c_str(), &_db);
-#endif
 
 	if (isOpen())
 	{
@@ -77,7 +73,7 @@ bool Database::open(string filename)
 
 bool Database::getTableFields(string tablename, std::vector<Field>& tbDef)
 {
-	sql::Field def_tbInfo[] =
+	std::vector<sql::Field> def_tbInfo =
 	{
 		sql::Field("cid", sql::type_int),
 		sql::Field("name", sql::type_text),
@@ -85,7 +81,6 @@ bool Database::getTableFields(string tablename, std::vector<Field>& tbDef)
 		sql::Field("notnull", sql::type_int),
 		sql::Field("dflt_value", sql::type_text),
 		sql::Field("pk", sql::type_int),
-		sql::Field(sql::DEFINITION_END),
 	};
 
 	FieldSet* pFieldSet = new FieldSet(def_tbInfo);
@@ -141,12 +136,13 @@ bool Database::getTableFields(string tablename, std::vector<Field>& tbDef)
 			eFlags = flag_not_null;
 		}
 
+		field_use eUse = FIELD_DEFAULT;
 		if (1 == nPKey)
 		{
-			eFlags = flag_primary_key;
+			eUse = FIELD_KEY;
 		}
 
-		Field field(sName, eType, eFlags);
+		Field field(sName, eType, eUse, eFlags);
 
 		tbDef.push_back(field);
 	}

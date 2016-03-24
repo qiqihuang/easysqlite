@@ -1,8 +1,6 @@
-#include <ctype.h>
-#include <string.h>
-#include <time.h>
 #include "SqlCommon.h"
-#include "sha1.h"
+#include "SHA1.h"
+
 
 namespace sql
 {
@@ -74,6 +72,7 @@ string time::format(const char* format)
 #elif defined(IOS_PLATFORM)
 	_localtime = localtime_r(&_value, _localtime);
 #elif defined(_WIN32)
+	_localtime = new tm;
 	localtime_s(_localtime, &_value);
 #elif defined(_LINUX)
 	_localtime = localtime(&_value);
@@ -86,6 +85,9 @@ string time::format(const char* format)
 			s = buffer;
 		}
 
+#if defined(_WIN32)
+		delete _localtime;
+#endif
 		_localtime = NULL;
 	}
 
@@ -203,7 +205,6 @@ string binToHex(const char* buffer, int size)
 
 string generateSHA(string& value)
 {
-#if 0
 	CSHA1 sha;
 
 	sha.Update((UINT_8*)value.c_str(), value.length());
@@ -216,14 +217,8 @@ string generateSHA(string& value)
 		const int size = sizeof(digest) / sizeof(UINT_8);
 		return binToHex((char*)digest, size);
 	}
-	
-	return "";
-#else
-	SHA1 ctx;
-	ctx.add(value.c_str(), value.size());
-	return ctx.getHash();
-#endif
 
+	return "";
 }
 
 string& trimleft(string& s)

@@ -10,16 +10,16 @@ using namespace sql;
 
 TEST(RecordSetup)
 {
-	Field def[] = 
+	std::vector<Field> def = 
 	{
-		Field(FIELD_KEY),
-		Field("name", type_text, flag_not_null),
+		Field("_ID", type_int, FIELD_KEY),
+		Field("name", type_text, FIELD_DEFAULT, flag_not_null),
 		Field("valueInt", type_int),
 		Field("valueDbl", type_float),
 		Field("valueTxt", type_text),
-		Field("valueBol", type_bool, flag_not_null),
+		Field("valueBol", type_bool, FIELD_DEFAULT, flag_not_null),
 		Field("valueTme", type_time),
-		Field(DEFINITION_END),
+		//Field(DEFINITION_END),
 	};
 
 	FieldSet fields(def);
@@ -50,16 +50,16 @@ TEST(RecordSetup)
 
 TEST(RecordQueries)
 {
-	Field def[] = 
+	std::vector<Field> def =
 	{
-		Field(FIELD_KEY),
-		Field("name", type_text, flag_not_null),
+		Field("_ID", type_int, FIELD_KEY),
+		Field("name", type_text, FIELD_DEFAULT, flag_not_null),
 		Field("valueInt", type_int),
 		Field("valueDbl", type_float),
 		Field("valueTxt", type_text),
-		Field("valueBol", type_bool, flag_not_null),
+		Field("valueBol", type_bool, FIELD_DEFAULT, flag_not_null),
 		Field("valueTme", type_time),
-		Field(DEFINITION_END),
+		//Field(DEFINITION_END),
 	};
 
 	FieldSet fields(def);
@@ -85,16 +85,16 @@ TEST(RecordQueries)
 
 TEST(RecordSetValues)
 {
-	Field def[] = 
+	std::vector<Field> def =
 	{
-		Field(FIELD_KEY),
-		Field("name", type_text, flag_not_null),
+		Field("_ID", type_int, FIELD_KEY),
+		Field("name", type_text, FIELD_DEFAULT, flag_not_null),
 		Field("valueInt", type_int),
 		Field("valueDbl", type_float),
 		Field("valueTxt", type_text),
-		Field("valueBol", type_bool, flag_not_null),
+		Field("valueBol", type_bool, FIELD_DEFAULT, flag_not_null),
 		Field("valueTme", type_time),
-		Field(DEFINITION_END),
+		//Field(DEFINITION_END),
 	};
 
 	FieldSet fields(def);
@@ -111,23 +111,23 @@ TEST(RecordSetValues)
 
 	CHECK_EQUAL(123, r.getKeyIdValue()->asInteger());
 
-	CHECK_EQUAL("123|test_text1|890|0.34500000|test_text2|1|0", r.toString());
+	CHECK_EQUAL("123|test_text1|890|0.34500000|test_text2|1|01-01-1970 08:00, Thu", r.toString());
 
 	CHECK_EQUAL("123, 'test_text1', 890, 0.34500000, 'test_text2', 1, 0", r.toSql());
 }
 
 TEST(RecordGetValues)
 {
-	Field def[] = 
+	std::vector<Field> def =
 	{
-		Field(FIELD_KEY),
-		Field("name", type_text, flag_not_null),
+		Field("_ID", type_int, FIELD_KEY),
+		Field("name", type_text, FIELD_DEFAULT, flag_not_null),
 		Field("valueInt", type_int),
 		Field("valueDbl", type_float),
 		Field("valueTxt", type_text),
-		Field("valueBol", type_bool, flag_not_null),
+		Field("valueBol", type_bool, FIELD_DEFAULT, flag_not_null),
 		Field("valueTme", type_time),
-		Field(DEFINITION_END),
+		//Field(DEFINITION_END),
 	};
 
 	FieldSet fields(def);

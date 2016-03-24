@@ -4,34 +4,14 @@
 namespace sql
 {
 
-Field::Field(field_use use)
-{
-	this->_name.clear();
-	this->_use = use;
-	this->_type = type_undefined;
-	this->_index = -1;
-	this->_flags = flag_none;
 
-	if (use == FIELD_KEY)
-	{
-		this->_name = "_ID";
-		this->_type = type_int;
-		this->_flags = flag_primary_key;
-	}
-}
-
-Field::Field(string name, field_type type, int flags)
+Field::Field(string name, field_type type, field_use use, int flags)
 {
 	this->_name = name;
-	this->_use = FIELD_DEFAULT;
+	this->_use = use;
 	this->_type = type;
 	this->_index = -1;
 	this->_flags = flags;
-
-	if (name == "_ID")//add by huangqi
-	{
-		this->_use = FIELD_KEY;
-	}
 }
 
 Field::Field(const Field& value)
@@ -41,16 +21,6 @@ Field::Field(const Field& value)
 	_type = value._type;
 	_index = value._index;
 	_flags = value._flags;
-}
-
-bool Field::isKeyIdField()
-{
-	return (_use == FIELD_KEY);
-}
-
-bool Field::isEndingField()
-{
-	return (_use == DEFINITION_END);
 }
 
 field_type Field::getType()
@@ -81,9 +51,14 @@ string Field::getTypeStr()
 	return "";
 }
 
-bool Field::isPrimaryKey()
+bool Field::isKeyIdField()
 {
-	return ((_flags & flag_primary_key) == flag_primary_key);
+	return (_use == FIELD_KEY);
+}
+
+bool Field::isAutoIncrement()
+{
+	return ((_flags & flag_autoincrement) == flag_autoincrement);
 }
 
 bool Field::isNotNull()
@@ -95,8 +70,11 @@ string Field::getDefinition()
 {
 	string value = _name + " " + getTypeStr();
 
-	if (isPrimaryKey())
+	if (isKeyIdField())
 		value += " PRIMARY KEY";
+
+	if (isAutoIncrement())
+		value += " AUTOINCREMENT";
 
 	if (isNotNull())
 		value += " NOT NULL";
@@ -149,7 +127,6 @@ Field* Field::createFromDefinition(string value)
 		if (flags.find("PRIMARY KEY") != std::string::npos)
 		{
 			_use = FIELD_KEY;
-			_flags = flag_primary_key;
 		}
 
 		if (flags.find("NOT NULL") != std::string::npos)
@@ -164,12 +141,7 @@ Field* Field::createFromDefinition(string value)
 	{
 		if (_type != type_undefined)
 		{
-			if (_use == FIELD_DEFAULT)
-			{
-				field = new Field(_name, _type, _flags);
-			} else {
-				field = new Field(_use);
-			}
+			field = new Field(_name, _type, _use, _flags);
 		}
 	}
 

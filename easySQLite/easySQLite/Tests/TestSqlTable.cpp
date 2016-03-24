@@ -10,22 +10,22 @@ namespace Tests
 using namespace sql;
 
 
-static Field* definition()
+static std::vector<Field> definition =
 {
-	static Field def[] = 
-	{
-		Field(FIELD_KEY),
-		Field("name", type_text, flag_not_null),
-		Field("valueInt", type_int),
-		Field("valueDbl", type_float),
-		Field("valueTxt", type_text),
-		Field("valueBol", type_bool, flag_not_null),
-		Field("valueTme", type_time),
-		Field(DEFINITION_END),
-	};
+	//static Field def[] = 
+	//{
+	Field("_ID", type_int, FIELD_KEY),
+	Field("name", type_text, FIELD_DEFAULT, flag_not_null),
+	Field("valueInt", type_int),
+	Field("valueDbl", type_float),
+	Field("valueTxt", type_text),
+	Field("valueBol", type_bool, FIELD_DEFAULT, flag_not_null),
+	Field("valueTme", type_time),
+	//Field(DEFINITION_END),
+	//};
 
-	return &def[0];
-}
+	//return &def[0];
+};
 
 static string strdef()
 {
@@ -60,7 +60,7 @@ TEST(TableSetup)
 	{
 		db.open("UnitTests.db");
 
-		Table tb(db.getHandle(), "test", definition());
+		Table tb(db.getHandle(), "test", definition);
 
 		CHECK_EQUAL("test", tb.name());
 
@@ -94,7 +94,12 @@ TEST(TableSetup)
 		CHECK_EQUAL(4, tb.recordCount());
 
 		//update data of record with _ID = 5
-		if (Record* record = tb.getRecordByKeyId(5))
+		std::string sql = std::string("select * from ") + tb.name() + " " + "WHERE _ID = 5";
+
+		sql::RecordSet* pRecordSet = new sql::RecordSet(tb.getHandle(), tb.fields());
+		bool bRet = pRecordSet->query(sql);
+
+		if (Record* record = pRecordSet->getTopRecord())
 		{
 			r.setString("name", "new_text5");
 			r.setInteger("valueInt", 111);
@@ -151,7 +156,7 @@ TEST(TableCreationFromString)
 	{
 		db.open("UnitTests.db");
 
-		Table tb(db.getHandle(), "test", definition());
+		Table tb(db.getHandle(), "test", definition);
 
 		sql::string strdef;
 		strdef += "_ID INTEGER PRIMARY KEY, ";

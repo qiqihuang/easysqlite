@@ -47,7 +47,7 @@ enum field_flags
 {
 	flag_none = 0,
 	flag_not_null = 1,
-	flag_primary_key = 2,
+	flag_autoincrement = 2,
 };
 
 

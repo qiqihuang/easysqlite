@@ -23,7 +23,7 @@ private:
 	RecordSet _recordset;
 
 public:
-	Table(sqlite3* db, string tableName, Field* definition);
+	Table(sqlite3* db, string tableName, const std::vector<Field>& vecFields);
 	Table(sqlite3* db, string tableName, FieldSet* fields);
 
 public:
@@ -52,7 +52,6 @@ public:
 	size_t recordCount();
 	Record* getRecord(int record_index);
 	Record* getTopRecord();
-	Record* getRecordByKeyId(integer keyId);
 
 public:
 	bool addRecord(Record* record);

@@ -10,17 +10,18 @@ using namespace sql;
 
 TEST(FieldKeySetup)
 {
-	Field f(FIELD_KEY);
+	Field f("_ID", type_int, FIELD_KEY);
 
 	CHECK_EQUAL("_ID INTEGER PRIMARY KEY", f.getDefinition());	
 	CHECK_EQUAL("_ID", f.getName());
 	CHECK_EQUAL(type_int, f.getType());
 	CHECK_EQUAL("INTEGER", f.getTypeStr());
-	CHECK(!f.isEndingField());
+	//CHECK(!f.isEndingField());
 	CHECK(f.isKeyIdField());
-	CHECK(f.isPrimaryKey());
+	//CHECK(f.isPrimaryKey());
 }
 
+#if 0
 TEST(FieldEndSetup)
 {
 	Field f(DEFINITION_END);
@@ -31,19 +32,20 @@ TEST(FieldEndSetup)
 	CHECK_EQUAL("", f.getTypeStr());
 	CHECK(f.isEndingField());
 }
+#endif
 
 TEST(FieldsDefinition)
 {
-	Field def[] = 
+	std::vector<Field> def = 
 	{
-		Field(FIELD_KEY),
-		Field("name", type_text, flag_not_null),
+		Field("_ID", type_int, FIELD_KEY),
+		Field("name", type_text, FIELD_DEFAULT, flag_not_null),
 		Field("valueInt", type_int),
 		Field("valueDbl", type_float),
 		Field("valueTxt", type_text),
-		Field("valueBol", type_bool, flag_not_null),
+		Field("valueBol", type_bool, FIELD_DEFAULT, flag_not_null),
 		Field("valueTme", type_time),
-		Field(DEFINITION_END),
+		//Field(DEFINITION_END),
 	};
 
 	CHECK_EQUAL("name TEXT NOT NULL", def[1].getDefinition());
@@ -56,7 +58,7 @@ TEST(FieldsDefinition)
 
 TEST(FieldCreation)
 {
-	Field f(FIELD_KEY);
+	Field f("_ID", type_int, FIELD_KEY);
 
 	CHECK_EQUAL("_ID INTEGER PRIMARY KEY", f.getDefinition());	
 

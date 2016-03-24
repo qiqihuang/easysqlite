@@ -10,22 +10,22 @@ namespace Tests
 using namespace sql;
 
 
-static Field* definition()
+std::vector<Field> definition =
 {
-	static Field def[] = 
-	{
-		Field(FIELD_KEY),
-		Field("name", type_text, flag_not_null),
+	//std::vector<Field> def =
+	//{
+		Field("_ID", type_int, FIELD_KEY),
+		Field("name", type_text, FIELD_DEFAULT, flag_not_null),
 		Field("valueInt", type_int),
 		Field("valueDbl", type_float),
 		Field("valueTxt", type_text),
-		Field("valueBol", type_bool, flag_not_null),
+		Field("valueBol", type_bool, FIELD_DEFAULT, flag_not_null),
 		Field("valueTme", type_time),
-		Field(DEFINITION_END),
-	};
+	//Field(DEFINITION_END),
+//};
 
-	return &def[0];
-}
+//return &def[0];
+};
 
 static void setValues(Record& r)
 {
@@ -55,7 +55,7 @@ TEST(RecordSetModify)
 	{
 		db.open("UnitTests.db");
 
-		Table tb(db.getHandle(), "test", definition());
+		Table tb(db.getHandle(), "test", definition);
 
 		if (tb.exists())
 			tb.remove();
@@ -90,7 +90,7 @@ TEST(RecordSetData)
 	{
 		db.open("UnitTests.db");
 
-		Table tb(db.getHandle(), "test", definition());
+		Table tb(db.getHandle(), "test", definition);
 
 		if (tb.exists())
 			tb.remove();

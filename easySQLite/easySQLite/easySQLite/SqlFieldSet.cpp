@@ -4,32 +4,14 @@
 namespace sql
 {
 
-FieldSet::FieldSet(Field* definition)
+FieldSet::FieldSet()
 {
-	//make fields map from array
-	if (definition)
-	{
-		int index = 0;
-		while (true)
-		{
-			Field& field = definition[index];
-
-			if (field.isEndingField())
-				break;
-
-			field._index = index;
-
-			_vec.push_back(field);			
-			_map[field.getName()] = &field;
-
-			index++;
-		}
-	}
 }
 
-FieldSet::FieldSet(std::vector<Field>& definition)
+
+FieldSet::FieldSet(const std::vector<Field>& vecFields)
 {
-	copy(definition);
+	copy(vecFields);
 }
 
 FieldSet::FieldSet(const FieldSet& source)
@@ -37,9 +19,9 @@ FieldSet::FieldSet(const FieldSet& source)
 	copy(source._vec);
 }
 
-void FieldSet::copy(const std::vector<Field>& definition)
+void FieldSet::copy(const std::vector<Field>& vecFields)
 {
-	_vec = definition;
+	_vec = vecFields;
 
 	//make fields map from vector
 	for (int index = 0; index < (int)_vec.size(); index++)
@@ -100,9 +82,7 @@ string FieldSet::getDefinition()
 
 string FieldSet::definitionHash()
 {
-	string sDefination = getDefinition();
-	string sSHA = generateSHA(sDefination);
-	return sSHA;
+	return generateSHA(getDefinition());
 }
 
 string FieldSet::toString()

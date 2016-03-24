@@ -8,26 +8,26 @@ namespace Tests
 using namespace sql;
 
 
-static Field* definition()
+static std::vector<Field> definition =
 {
-	static Field def[] = 
-	{
-		Field(FIELD_KEY),
-		Field("name", type_text, flag_not_null),
+	//static Field def[] = 
+	//{
+		Field("_ID", type_int, FIELD_KEY),
+		Field("name", type_text, FIELD_DEFAULT, flag_not_null),
 		Field("valueInt", type_int),
 		Field("valueDbl", type_float),
 		Field("valueTxt", type_text),
-		Field("valueBol", type_bool, flag_not_null),
+		Field("valueBol", type_bool, FIELD_DEFAULT, flag_not_null),
 		Field("valueTme", type_time),
-		Field(DEFINITION_END),
-	};
+	//Field(DEFINITION_END),
+//};
 
-	return &def[0];
-}
+//return &def[0];
+};
 
 TEST(FieldSet)
 {
-	FieldSet fields(definition());
+	FieldSet fields(definition);
 
 	CHECK_EQUAL(7, fields.count());
 
@@ -54,7 +54,7 @@ TEST(FieldSet)
 
 TEST(FieldSetCreation)
 {
-	FieldSet fields(definition());
+	FieldSet fields(definition);
 
 	sql::string strdef;
 	strdef += "_ID INTEGER PRIMARY KEY, ";
@@ -98,7 +98,7 @@ TEST(FieldSetCreationFromString)
 
 TEST(FieldSetFieldsOrder)
 {
-	FieldSet fields(definition());
+	FieldSet fields(definition);
 
 	CHECK_EQUAL(7, fields.count());
 

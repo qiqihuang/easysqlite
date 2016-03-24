@@ -25,20 +25,19 @@ private:
 	int _flags;
 
 public:
-	Field(field_use use);
-	Field(string name, field_type type, int flags = flag_none);
+	Field(string name, field_type type, field_use use = FIELD_DEFAULT, int flags = flag_none);
 	Field(const Field& value);
 
 public:
 	bool isKeyIdField();
-	bool isEndingField();
 
 public:
 	int getIndex();
 	string getName();
 	string getTypeStr();
 	field_type getType();
-	bool isPrimaryKey();
+
+	bool isAutoIncrement();
 	bool isNotNull();
 
 public:

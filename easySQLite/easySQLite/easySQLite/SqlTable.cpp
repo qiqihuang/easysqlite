@@ -4,8 +4,8 @@
 namespace sql
 {
 
-Table::Table(sqlite3* db, string tableName, Field* definition)
-	: _db(db), _tableName(tableName), _recordset(db, definition)
+Table::Table(sqlite3* db, string tableName, const std::vector<Field>& vecFields)
+	: _db(db), _tableName(tableName), _recordset(db, vecFields)
 {
 }
 
@@ -231,20 +231,6 @@ Record* Table::getTopRecord()
 	return getRecord(0);
 }
 
-Record* Table::getRecordByKeyId(integer keyId)
-{
-	const string queryStr = "select * from " + _tableName + " where _ID = " + intToStr(keyId);
-
-	if (_recordset.query(queryStr))
-	{
-		if (_recordset.count() > 0)
-		{
-			return _recordset.getRecord(0);
-		}
-	}
-
-	return NULL;
-}
 
 bool Table::addRecord(Record* record)
 {
@@ -302,7 +288,7 @@ bool Table::updateRecord(std::map<Field*, Value*> mapColumn)
 			continue;
 		}
 
-		sCondition = " where _ID = " + value->toSql(type_int);
+		sCondition = " where " + field->getName() + " = " + value->toSql(field->getType());
 		break;
 	}
 

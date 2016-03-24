@@ -21,11 +21,11 @@ private:
 	std::map<string, Field*> _map;
 
 private:
-	void copy(const std::vector<Field>& definition);
+	void copy(const std::vector<Field>& vecFields);
 
 public:
-	FieldSet(Field* definition);
-	FieldSet(std::vector<Field>& definition);
+	FieldSet();
+	FieldSet(const std::vector<Field>& vecFields);
 	FieldSet(const FieldSet& source);
 
 public:

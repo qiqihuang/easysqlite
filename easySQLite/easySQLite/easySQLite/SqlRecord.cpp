@@ -227,8 +227,15 @@ string Record::toSqlUpdate(string tableName)
 		}
 	}
 
-	if (Value* value = getKeyIdValue())
-		s += " where _ID = " + value->toSql(type_int);
+	Field* pKeyField = _fields->getKeyId();
+	if (NULL != pKeyField)
+	{
+		Value* pKeyValue = getValue(pKeyField->getIndex());
+		if (NULL != pKeyValue)
+		{
+			s += " where " + pKeyField->getName() + " = " + pKeyValue->toSql(pKeyField->getType());
+		}
+	}
 
 	return s;
 }

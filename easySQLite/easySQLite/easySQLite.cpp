@@ -17,13 +17,13 @@ using namespace sql;
 void example1()
 {
 	//define table structure
-	Field definition_tbPerson[] = 
+	std::vector<Field> definition_tbPerson = 
 	{
-		Field(FIELD_KEY),
-		Field("fname", type_text, flag_not_null),
-		Field("lname", type_text, flag_not_null),
+		Field("_ID", type_int, FIELD_KEY),
+		Field("fname", type_text, FIELD_DEFAULT, flag_not_null),
+		Field("lname", type_text, FIELD_DEFAULT, flag_not_null),
 		Field("birthdate", type_time),
-		Field(DEFINITION_END),
+		//Field(DEFINITION_END),
 	};
 
 	//define database object
@@ -57,7 +57,11 @@ void example1()
 			tbPerson.addRecord(&record);
 
 		//select record to update
-		if (Record* record = tbPerson.getRecordByKeyId(7))
+		std::string sql = std::string("select * from ") + tbPerson.name() + " " + "WHERE _ID = 7";
+
+		sql::RecordSet* pRecordSet = new sql::RecordSet(tbPerson.getHandle(), tbPerson.fields());
+		bool bRet = pRecordSet->query(sql);
+		if (Record* record = pRecordSet->getTopRecord())
 		{
 			record->setString("fname", "Frank");
 			record->setString("lname", "Sinatra");
@@ -84,16 +88,16 @@ void example1()
 
 void example2()
 {
-	Field definition_tbTest[] = 
+	std::vector<Field> definition_tbTest =
 	{
-		Field(FIELD_KEY),
-		Field("name", type_text, flag_not_null),
+		Field("_ID", type_int, FIELD_KEY),
+		Field("name", type_text, FIELD_DEFAULT, flag_not_null),
 		Field("valueInt", type_int),
 		Field("valueDbl", type_float),
 		Field("valueTxt", type_text),
-		Field("valueBol", type_bool, flag_not_null),
+		Field("valueBol", type_bool, FIELD_DEFAULT, flag_not_null),
 		Field("valueTme", type_time),
-		Field(DEFINITION_END),
+		//Field(DEFINITION_END),
 	};
 
 	Database db;
